@@ -50,7 +50,7 @@ HostConstSharedPtr OriginalDstCluster::LoadBalancer::chooseHost(LoadBalancerCont
       const Network::Address::Ip* dst_ip = dst_addr.ip();
       if (dst_ip) {
         Network::Address::InstanceConstSharedPtr host_ip_port(
-            Network::Utility::copyInternetAddressAndPort(*dst_ip));
+            Network::Utility::copyInternetAddressOnly(*dst_ip, 443));
         // Create a host we can use immediately.
         auto info = parent_->info();
         HostSharedPtr host(std::make_shared<HostImpl>(
