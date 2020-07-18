@@ -353,6 +353,8 @@ message Cluster {
     //   route traffic to arbitrary hosts and/or ports, which may have serious security
     //   consequences.
     bool use_http_header = 1;
+
+    google.protobuf.UInt32Value port = 2;
   }
 
   // Common configuration for all load balancer implementations.

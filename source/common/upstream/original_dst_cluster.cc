@@ -113,9 +113,7 @@ OriginalDstCluster::OriginalDstCluster(
       use_http_header_(info_->lbOriginalDstConfig()
                            ? info_->lbOriginalDstConfig().value().use_http_header()
                            : false),
-      port_(info_->lbOriginalDstConfig()
-                           ? info_->lbOriginalDstConfig().value().port()
-                           : 0),
+      port_(info_->lbOriginalDstConfig() ? info_->lbOriginalDstConfig().value().port().value() : static_cast<uint32_t>(0)),
       host_map_(std::make_shared<HostMap>()) {
   // TODO(dio): Remove hosts check once the hosts field is removed.
   if (config.has_load_assignment() || !config.hidden_envoy_deprecated_hosts().empty()) {
