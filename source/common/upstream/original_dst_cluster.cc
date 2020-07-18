@@ -50,7 +50,7 @@ HostConstSharedPtr OriginalDstCluster::LoadBalancer::chooseHost(LoadBalancerCont
       const Network::Address::Ip* dst_ip = dst_addr.ip();
       if (dst_ip) {
         Network::Address::InstanceConstSharedPtr host_ip_port(
-            Network::Utility::copyInternetAddressOnly(*dst_ip, 443));
+            Network::Utility::copyInternetAddressOnly(*dst_ip, port_));
         // Create a host we can use immediately.
         auto info = parent_->info();
         HostSharedPtr host(std::make_shared<HostImpl>(
@@ -113,6 +113,9 @@ OriginalDstCluster::OriginalDstCluster(
       use_http_header_(info_->lbOriginalDstConfig()
                            ? info_->lbOriginalDstConfig().value().use_http_header()
                            : false),
+      port_(info_->lbOriginalDstConfig()
+                           ? info_->lbOriginalDstConfig().value().port()
+                           : 0),
       host_map_(std::make_shared<HostMap>()) {
   // TODO(dio): Remove hosts check once the hosts field is removed.
   if (config.has_load_assignment() || !config.hidden_envoy_deprecated_hosts().empty()) {
