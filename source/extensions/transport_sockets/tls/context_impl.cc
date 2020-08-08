@@ -960,7 +960,7 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
       [](const SSL_CLIENT_HELLO* client_hello) -> ssl_select_cert_result_t {
 
         const char* server_name = SSL_get_servername(client_hello->ssl, TLSEXT_NAMETYPE_host_name);
-        ENVOY_LOG(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
+        ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
 
         return static_cast<ServerContextImpl*>(
                    SSL_CTX_get_app_data(SSL_get_SSL_CTX(client_hello->ssl)))
