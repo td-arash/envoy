@@ -131,6 +131,15 @@ message PrivateKeyProvider {
   }
 }
 
+message TlsMITMCertificate {
+  option (udpa.annotations.versioning).previous_message_type =
+      "envoy.extensions.transport_sockets.tls.v3.TlsMITMCertificate";
+
+  config.core.v4alpha.DataSource certificate_chain = 1;
+
+  config.core.v4alpha.DataSource private_key = 2;
+}
+
 // [#next-free-field: 7]
 message TlsCertificate {
   option (udpa.annotations.versioning).previous_message_type =
@@ -434,7 +443,7 @@ message UpstreamTlsContext {
   google.protobuf.UInt32Value max_session_keys = 4;
 }
 
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 message DownstreamTlsContext {
   option (udpa.annotations.versioning).previous_message_type =
       "envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext";
@@ -476,6 +485,8 @@ message DownstreamTlsContext {
     lt {seconds: 4294967296}
     gte {}
   }];
+
+  TlsMITMCertificate mitm_certificate = 8;
 }
 
 message GenericSecret {

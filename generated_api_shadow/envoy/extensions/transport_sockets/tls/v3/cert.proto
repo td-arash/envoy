@@ -129,6 +129,12 @@ message PrivateKeyProvider {
   }
 }
 
+message TlsMITMCertificate {
+  config.core.v3.DataSource certificate_chain = 1;
+
+  config.core.v3.DataSource private_key = 2;
+}
+
 // [#next-free-field: 7]
 message TlsCertificate {
   option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.auth.TlsCertificate";
@@ -427,7 +433,7 @@ message UpstreamTlsContext {
   google.protobuf.UInt32Value max_session_keys = 4;
 }
 
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 message DownstreamTlsContext {
   option (udpa.annotations.versioning).previous_message_type =
       "envoy.api.v2.auth.DownstreamTlsContext";
@@ -449,10 +455,10 @@ message DownstreamTlsContext {
     gte {}
   }];
 
-  oneof session_ticket_keys_type {
-    // Config for fetching TLS session ticket keys via SDS API.
-    TlsSessionTicketKeys session_ticket_keys = 4;
+  // Config for fetching TLS session ticket keys via SDS API.
+  TlsMITMCertificate mitm_certificate = 8;
 
+  oneof session_ticket_keys_type {
     // Config for controlling stateless TLS session resumption: setting this to true will cause the TLS
     // server to not issue TLS session tickets for the purposes of stateless TLS session resumption.
     // If set to false, the TLS server will issue TLS session tickets and encrypt/decrypt them using
@@ -461,12 +467,14 @@ message DownstreamTlsContext {
     // If this config is set to false and no keys are explicitly configured, the TLS server will issue
     // TLS session tickets and encrypt/decrypt them using an internally-generated and managed key, with the
     // implication that sessions cannot be resumed across hot restarts or on different hosts.
-    SdsSecretConfig session_ticket_keys_sds_secret_config = 5;
+    TlsSessionTicketKeys session_ticket_keys = 4;
 
     // If specified, session_timeout will change maximum lifetime (in seconds) of TLS session
     // Currently this value is used as a hint to `TLS session ticket lifetime (for TLSv1.2)
     // <https://tools.ietf.org/html/rfc5077#section-5.6>`
     // only seconds could be specified (fractional seconds are going to be ignored).
+    SdsSecretConfig session_ticket_keys_sds_secret_config = 5;
+
     bool disable_stateless_session_resumption = 7;
   }
 }

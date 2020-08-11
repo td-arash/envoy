@@ -127,6 +127,7 @@ message PrivateKeyProvider {
 
 message TlsMITMCertificate {
   core.DataSource certificate_chain = 1;
+
   core.DataSource private_key = 2;
 }
 
@@ -420,7 +421,7 @@ message UpstreamTlsContext {
   google.protobuf.UInt32Value max_session_keys = 4;
 }
 
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 message DownstreamTlsContext {
   // Common TLS context settings.
   CommonTlsContext common_tls_context = 1;
@@ -461,7 +462,6 @@ message DownstreamTlsContext {
   }];
 
   TlsMITMCertificate mitm_certificate = 8;
-
 }
 
 message GenericSecret {

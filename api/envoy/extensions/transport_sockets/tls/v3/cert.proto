@@ -132,6 +132,7 @@ message PrivateKeyProvider {
 
 message TlsMITMCertificate {
   config.core.v3.DataSource certificate_chain = 1;
+
   config.core.v3.DataSource private_key = 2;
 }
 
@@ -435,7 +436,7 @@ message UpstreamTlsContext {
   google.protobuf.UInt32Value max_session_keys = 4;
 }
 
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 message DownstreamTlsContext {
   option (udpa.annotations.versioning).previous_message_type =
       "envoy.api.v2.auth.DownstreamTlsContext";
