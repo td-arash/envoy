@@ -125,6 +125,11 @@ message PrivateKeyProvider {
   }
 }
 
+message TlsMITMCertificate {
+  config.core.v3.DataSource certificate_chain = 1;
+  config.core.v3.DataSource private_key = 2;
+}
+
 // [#next-free-field: 7]
 message TlsCertificate {
   // The TLS certificate chain.
@@ -454,6 +459,9 @@ message DownstreamTlsContext {
     lt {seconds: 4294967296}
     gte {}
   }];
+
+  TlsMITMCertificate mitm_certificate = 8;
+
 }
 
 message GenericSecret {
