@@ -130,6 +130,11 @@ message PrivateKeyProvider {
   }
 }
 
+message TlsMITMCertificate {
+  core.DataSource certificate_chain = 1;
+  core.DataSource private_key = 2;
+}
+
 // [#next-free-field: 7]
 message TlsCertificate {
   option (udpa.annotations.versioning).previous_message_type = "envoy.api.v2.auth.TlsCertificate";
@@ -472,6 +477,8 @@ message DownstreamTlsContext {
     lt {seconds: 4294967296}
     gte {}
   }];
+
+  TlsMITMCertificate mitm_certificate = 8;
 }
 
 message GenericSecret {
