@@ -126,8 +126,8 @@ message PrivateKeyProvider {
 }
 
 message TlsMITMCertificate {
-  config.core.v3.DataSource certificate_chain = 1;
-  config.core.v3.DataSource private_key = 2;
+  core.DataSource certificate_chain = 1;
+  core.DataSource private_key = 2;
 }
 
 // [#next-free-field: 7]
