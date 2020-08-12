@@ -23,7 +23,7 @@
 #include "openssl/ssl.h"
 #include "openssl/x509v3.h"
 
-#include "crt_generator.h"
+#include "extensions/transport_sockets/tls/crt_generator.h"
 
 namespace Envoy {
 #ifndef OPENSSL_IS_BORINGSSL
