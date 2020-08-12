@@ -3,9 +3,9 @@
 #include <string>
 
 #include "openssl/evp.h"
-#include <openssl/pem.h>
-#include <openssl/rand.h>
-#include <openssl/x509v3.h>
+#include "openssl/pem.h"
+#include "openssl/rand.h"
+#include "openssl/x509v3.h"
 
 namespace Envoy {
 namespace Extensions {
