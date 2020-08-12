@@ -947,12 +947,8 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
     throw EnvoyException("Server TlsCertificates must have a certificate specified");
   }
 
-  std::string serverNames = "";
-  for (auto s : server_names) {
-    serverNames = serverNames + " " + s;
-  }
+  this->crtGenerator_.reset(new Envoy::Extensions::TransportSockets::Tls::CrtGenerator());
 
-  std::cerr << fmt::format("--->>>> SERVER_NAMES: {}", serverNames) << std::flush;
   // Compute the session context ID hash. We use all the certificate identities,
   // since we should have a common ID for session resumption no matter what cert
   // is used. We do this early because it can throw an EnvoyException.
@@ -964,12 +960,9 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
   SSL_CTX_set_select_certificate_cb(
       tls_contexts_[0].ssl_ctx_.get(),
       [](const SSL_CLIENT_HELLO* client_hello) -> ssl_select_cert_result_t {
-        const char* server_name = SSL_get_servername(client_hello->ssl, TLSEXT_NAMETYPE_host_name);
-        ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
-
         return static_cast<ServerContextImpl*>(
                    SSL_CTX_get_app_data(SSL_get_SSL_CTX(client_hello->ssl)))
-            ->selectTlsContext(client_hello);
+            ->selectTlsContext(client_hello, true);
       });
 
   for (auto& ctx : tls_contexts_) {
@@ -1281,17 +1274,31 @@ bool ServerContextImpl::isClientEcdsaCapable(const SSL_CLIENT_HELLO* ssl_client_
 }
 
 enum ssl_select_cert_result_t
-ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello) {
+ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bool useCrtGenerator) {
   const bool client_ecdsa_capable = isClientEcdsaCapable(ssl_client_hello);
   // Fallback on first certificate.
   const TlsContext* selected_ctx = &tls_contexts_[0];
-  for (const auto& ctx : tls_contexts_) {
-    if (client_ecdsa_capable == ctx.is_ecdsa_) {
-      selected_ctx = &ctx;
-      break;
+  SSL_CTX *ssl_ctx = selected_ctx->ssl_ctx_.get();
+
+  if (!useCtrGenerator) {
+    for (const auto& ctx : tls_contexts_) {
+      if (client_ecdsa_capable == ctx.is_ecdsa_) {
+        ssl_ctx = &ctx->ssl_ctx_.get();
+        break;
+      }
+    }
+  } else {
+    const char* server_name = SSL_get_servername(client_hello->ssl, TLSEXT_NAMETYPE_host_name);
+    ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
+    auto sslCtxUniquePtr = this->context_map_.find(std::string(server_name));
+    if (sslCtxUniquePtr != this->context_map_.end()) {
+      ssl_ctx = sslCtxUniquePtr.get();
+    } else {
+      ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: context not found", );
     }
   }
-  RELEASE_ASSERT(SSL_set_SSL_CTX(ssl_client_hello->ssl, selected_ctx->ssl_ctx_.get()) != nullptr,
+  
+  RELEASE_ASSERT(SSL_set_SSL_CTX(ssl_client_hello->ssl, ssl_ctx) != nullptr,
                  "");
   return ssl_select_cert_success;
 }

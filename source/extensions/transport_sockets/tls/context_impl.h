@@ -23,6 +23,8 @@
 #include "openssl/ssl.h"
 #include "openssl/x509v3.h"
 
+#include "crt_generator.h"
+
 namespace Envoy {
 #ifndef OPENSSL_IS_BORINGSSL
 #error Envoy requires BoringSSL
@@ -239,11 +241,14 @@ private:
   bool isClientEcdsaCapable(const SSL_CLIENT_HELLO* ssl_client_hello);
   // Select the TLS certificate context in SSL_CTX_set_select_certificate_cb() callback with
   // ClientHello details.
-  enum ssl_select_cert_result_t selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello);
+  enum ssl_select_cert_result_t selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bool useCrtGenerator);
 
   SessionContextID generateHashForSessionContextId(const std::vector<std::string>& server_names);
 
   const std::vector<Envoy::Ssl::ServerContextConfig::SessionTicketKey> session_ticket_keys_;
+
+  std::unique_ptr<Envoy::Extensions::TransportSockets::Tls::CrtGenerator> crtGenerator_;
+  std::unordered_map<std::string,bssl::UniquePtr<SSL_CTX>> context_map_;
 };
 
 } // namespace Tls
