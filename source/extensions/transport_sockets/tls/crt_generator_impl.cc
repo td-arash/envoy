@@ -117,12 +117,12 @@ int Envoy::Extensions::TransportSockets::Tls::CrtGenerator::generateCsr(EVP_PKEY
 
 	/* Set the DN of the request. */
 	name = X509_REQ_get_subject_name(*req);
-	X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC, static_cast<const char*>("US"), -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "ST", MBSTRING_ASC, static_cast<const char*>("CA"), -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "L", MBSTRING_ASC, static_cast<const char*>(""), -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, static_cast<const char*>("TraceData"), -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, static_cast<const char*>(""), -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, static_cast<const char*>(common_name), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC,  reinterpret_cast<const unsigned char*>("US"), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "ST", MBSTRING_ASC,  reinterpret_cast<const unsigned char*>("CA"), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "L", MBSTRING_ASC,  reinterpret_cast<const unsigned char*>(""), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC,  reinterpret_cast<const unsigned char*>("TraceData"), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC,  reinterpret_cast<const unsigned char*>(""), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC,  reinterpret_cast<const unsigned char*>(common_name), -1, -1, 0);
 
 	/* Self-sign the request to prove that we posses the key. */
 	if (!X509_REQ_sign(*req, *key, EVP_sha256())) goto err;
