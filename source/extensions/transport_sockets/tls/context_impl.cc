@@ -949,7 +949,7 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
 
   std::string serverNames = "";
   for (auto s : server_names) {
-    sererNames = serverNames + " " + s;
+    serverNames = serverNames + " " + s;
   }
 
   ENVOY_LOG_MISC(debug, "--->>> SERVER_NAMES: {}", serverNames);
