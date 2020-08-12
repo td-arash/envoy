@@ -72,7 +72,7 @@ int Envoy::Extensions::TransportSockets::Tls::CrtGenerator::generateCrtAndKey(EV
 
 	/* Set validity of certificate to 2 years. */
 	X509_gmtime_adj(X509_get_notBefore(*crt), 0);
-	X509_gmtime_adj(X509_get_notAfter(*crt), (long)2*365*3600);
+	X509_gmtime_adj(X509_get_notAfter(*crt), static_cast<long>(2*365*3600));
 
 	/* Get the request's subject and just use it (we don't bother checking it since we generated
 	 * it ourself). Also take the request's public key. */
@@ -117,12 +117,12 @@ int Envoy::Extensions::TransportSockets::Tls::CrtGenerator::generateCsr(EVP_PKEY
 
 	/* Set the DN of the request. */
 	name = X509_REQ_get_subject_name(*req);
-	X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC, (const unsigned char*)"US", -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "ST", MBSTRING_ASC, (const unsigned char*)"CA", -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "L", MBSTRING_ASC, (const unsigned char*)"", -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, (const unsigned char*)"TraceData", -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (const unsigned char*)"", -1, -1, 0);
-	X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (const unsigned char*)common_name, -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC, static_cast<const unsigned char*>("US"), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "ST", MBSTRING_ASC, static_cast<const unsigned char*>("CA"), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "L", MBSTRING_ASC, static_cast<const unsigned char*>(""), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, static_cast<const unsigned char*>("TraceData"), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, static_cast<const unsigned char*>(""), -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, static_cast<const unsigned char*>(common_name), -1, -1, 0);
 
 	/* Self-sign the request to prove that we posses the key. */
 	if (!X509_REQ_sign(*req, *key, EVP_sha256())) goto err;
