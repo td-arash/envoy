@@ -947,7 +947,7 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
     throw EnvoyException("Server TlsCertificates must have a certificate specified");
   }
 
-  this->crtGenerator_.reset(new Envoy::Extensions::TransportSockets::Tls::CrtGenerator());
+  this->crtGenerator_.reset(new Envoy::Extensions::TransportSockets::Tls::CrtGenerator("/etc/certs/rootCA.key", "/etc/certs/rootCA.crt");
 
   // Compute the session context ID hash. We use all the certificate identities,
   // since we should have a common ID for session resumption no matter what cert
@@ -1280,21 +1280,21 @@ ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bo
   const TlsContext* selected_ctx = &tls_contexts_[0];
   SSL_CTX *ssl_ctx = selected_ctx->ssl_ctx_.get();
 
-  if (!useCtrGenerator) {
+  if (!useCrtGenerator) {
     for (const auto& ctx : tls_contexts_) {
       if (client_ecdsa_capable == ctx.is_ecdsa_) {
-        ssl_ctx = &ctx->ssl_ctx_.get();
+        ssl_ctx = ctx.ssl_ctx_.get();
         break;
       }
     }
   } else {
-    const char* server_name = SSL_get_servername(client_hello->ssl, TLSEXT_NAMETYPE_host_name);
+    const char* server_name = SSL_get_servername(ssl_client_hello->ssl, TLSEXT_NAMETYPE_host_name);
     ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
     auto sslCtxUniquePtr = this->context_map_.find(std::string(server_name));
     if (sslCtxUniquePtr != this->context_map_.end()) {
       ssl_ctx = sslCtxUniquePtr.get();
     } else {
-      ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: context not found", );
+      ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: context not found");
     }
   }
   
