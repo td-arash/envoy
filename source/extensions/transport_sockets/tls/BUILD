@@ -85,10 +85,12 @@ envoy_cc_library(
     srcs = [
         "context_impl.cc",
         "context_manager_impl.cc",
+        "crt_generator_impl.cc",
     ],
     hdrs = [
         "context_impl.h",
         "context_manager_impl.h",
+        "crt_generator.h",
     ],
     external_deps = [
         "abseil_synchronization",
