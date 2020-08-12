@@ -952,7 +952,7 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
     serverNames = serverNames + " " + s;
   }
 
-  ENVOY_LOG_MISC(debug, "--->>> SERVER_NAMES: {}", serverNames);
+  ENVOY_LOG_MISC(debug, "--->>>> SERVER_NAMES: {}", serverNames);
   // Compute the session context ID hash. We use all the certificate identities,
   // since we should have a common ID for session resumption no matter what cert
   // is used. We do this early because it can throw an EnvoyException.
@@ -964,7 +964,6 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
   SSL_CTX_set_select_certificate_cb(
       tls_contexts_[0].ssl_ctx_.get(),
       [](const SSL_CLIENT_HELLO* client_hello) -> ssl_select_cert_result_t {
-
         const char* server_name = SSL_get_servername(client_hello->ssl, TLSEXT_NAMETYPE_host_name);
         ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
 
