@@ -947,6 +947,12 @@ ServerContextImpl::ServerContextImpl(Stats::Scope& scope,
     throw EnvoyException("Server TlsCertificates must have a certificate specified");
   }
 
+  std::string serverNames = "";
+  for (auto s : server_names) {
+    sererNames = serverNames + " " + s;
+  }
+
+  ENVOY_LOG_MISC(debug, "--->>> SERVER_NAMES: {}", serverNames);
   // Compute the session context ID hash. We use all the certificate identities,
   // since we should have a common ID for session resumption no matter what cert
   // is used. We do this early because it can throw an EnvoyException.
