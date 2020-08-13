@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 
 #include "openssl/evp.h"
 #include "openssl/pem.h"
