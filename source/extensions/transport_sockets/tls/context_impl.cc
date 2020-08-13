@@ -1292,15 +1292,45 @@ ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bo
     ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
     const auto& iterator = this->context_map_.find(std::string(server_name));
     if (iterator != this->context_map_.end()) {
+      ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: found context for: {}", server_name);
       ssl_ctx = iterator->second.get();
     } else {
       ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: context not found");
+      const auto& sslCtxPtr = this->makeSslCtx(sercer_name);
+      this->context_map_.insert(std::make_pair(server_name, sslCtxPtr));
+      ssl_ctx = sslCtxPtr.get();
     }
   }
   
   RELEASE_ASSERT(SSL_set_SSL_CTX(ssl_client_hello->ssl, ssl_ctx) != nullptr,
                  "");
   return ssl_select_cert_success;
+}
+
+bssl::UniquePtr<SSL_CTX>
+ServerContextImpl::makeSslCtx(std::string server_name) {
+  EVP_PKEY *key = NULL;
+	X509 *crt = NULL;
+  bssl::UniquePtr<SSL_CTX> sslCtxPtr(SSL_CTX_new(TLS_method()));
+  if (this->crtGenerator_.get()->generateCrtAndKey(&key, &crt, server_name.c_str())) {
+
+    if (crt == NULL ||
+        !SSL_CTX_use_certificate(sslCtxPtr.get(), crt)) {
+      while (uint64_t err = ERR_get_error()) {
+        ENVOY_LOG_MISC(debug, "--->>> SSL error: {}:{}:{}:{}", err, ERR_lib_error_string(err),
+                       ERR_func_error_string(err), ERR_GET_REASON(err),
+                       ERR_reason_error_string(err));
+      }
+      throw EnvoyException("Unable to load certificate");
+    }
+
+    if (key == NULL || !SSL_CTX_use_PrivateKey(sslCtxPtr.get(), key)) {
+        throw EnvoyException("Unable to load key");
+    }
+    return sslCtxPtr;
+  }
+  sslCtxPtr.reset(nullptr);
+  return sslCtxPtr;
 }
 
 void ServerContextImpl::TlsContext::addClientValidationContext(

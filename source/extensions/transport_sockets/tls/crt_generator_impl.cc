@@ -18,9 +18,9 @@ namespace Tls {
 Envoy::Extensions::TransportSockets::
 Tls::CrtGenerator::CrtGenerator(std::string ca_key_path, std::string ca_crt_path) : 
 ca_key_path_(ca_key_path), ca_crt_path_(ca_crt_path) {
-    this->loadRootCaKeyAndCrt();
-    this->ca_crt = NULL;
+	this->ca_crt = NULL;
     this->ca_key = NULL;
+    this->loadRootCaKeyAndCrt();
 }
 
 Envoy::Extensions::TransportSockets::Tls::CrtGenerator::~CrtGenerator() {

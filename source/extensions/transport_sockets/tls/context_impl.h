@@ -243,6 +243,8 @@ private:
   // ClientHello details.
   enum ssl_select_cert_result_t selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bool useCrtGenerator);
 
+  bssl::UniquePtr<SSL_CTX> ServerContextImpl::makeSslCtx(std::string server_name);
+
   SessionContextID generateHashForSessionContextId(const std::vector<std::string>& server_names);
 
   const std::vector<Envoy::Ssl::ServerContextConfig::SessionTicketKey> session_ticket_keys_;
