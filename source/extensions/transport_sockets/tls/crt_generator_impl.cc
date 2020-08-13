@@ -5,6 +5,8 @@
 #include "openssl/rand.h"
 #include "openssl/x509v3.h"
 
+#include "common/common/utility.h"
+
 #include "extensions/transport_sockets/tls/crt_generator.h"
 
 namespace Envoy {
@@ -15,7 +17,7 @@ namespace Tls {
 Envoy::Extensions::TransportSockets::
 Tls::CrtGenerator::CrtGenerator(std::string ca_key_path, std::string ca_crt_path) : 
 ca_key_path_(ca_key_path), ca_crt_path_(ca_crt_path) {
-    //this->loadCaKeyAndCrt();;
+    this->loadRootCaKeyAndCrt();
     this->ca_crt = NULL;
     this->ca_key = NULL;
 }
@@ -41,11 +43,13 @@ int Envoy::Extensions::TransportSockets::Tls::CrtGenerator::loadRootCaKeyAndCrt(
 	this->ca_key = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL);
 	if (!this->ca_key) goto err;
 	BIO_free_all(bio);
+	ENVOY_LOG_MISC(debug, "--->> rootCA key and crt loaded successfuly!");
 	return 1;
 err:
 	BIO_free_all(bio);
-	X509_free(this->ca_crt);
-	EVP_PKEY_free(this->ca_key);
+	//X509_free(this->ca_crt);
+	//EVP_PKEY_free(this->ca_key);
+	ENVOY_LOG_MISC(debug, "--->> unable to load rootCA key and crt!");
 	return 0;
 }
 
