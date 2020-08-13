@@ -1290,8 +1290,8 @@ ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bo
   } else {
     const char* server_name = SSL_get_servername(ssl_client_hello->ssl, TLSEXT_NAMETYPE_host_name);
     ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
-    auto& iterator = this->context_map_.find(std::string(server_name));
-    if (sslCtxUniquePtr != this->context_map_.end()) {
+    const auto& iterator = this->context_map_.find(std::string(server_name));
+    if (iterator != this->context_map_.end()) {
       ssl_ctx = iterator.second.get();
     } else {
       ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: context not found");
