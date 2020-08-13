@@ -1296,8 +1296,8 @@ ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bo
       ssl_ctx = iterator->second.get();
     } else {
       ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: context not found");
-      const auto& sslCtxPtr = this->makeSslCtx(sercer_name);
-      this->context_map_.insert(std::make_pair(server_name, sslCtxPtr));
+      const auto& sslCtxPtr = this->makeSslCtx(server_name);
+      this->context_map_.insert({server_name, sslCtxPtr});
       ssl_ctx = sslCtxPtr.get();
     }
   }
