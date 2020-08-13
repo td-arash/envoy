@@ -43,14 +43,14 @@ int Envoy::Extensions::TransportSockets::Tls::CrtGenerator::loadRootCaKeyAndCrt(
 	this->ca_key = PEM_read_bio_PrivateKey(bio, NULL, NULL, NULL);
 	if (!this->ca_key) goto err;
 	BIO_free_all(bio);
-	std::cerr << "--->> rootCA key and crt loaded successfully\n" << std::flush
+	std::cerr << "--->> rootCA key and crt loaded successfully\n" << std::flush;
 	return 1;
 err:
 	BIO_free_all(bio);
 	//X509_free(this->ca_crt);
 	//EVP_PKEY_free(this->ca_key);
 	ENVOY_LOG_MISC(debug, "--->> rootCA key and crt failed to load!");
-	std::cerr << "--->> rootCA key and crt failed to load!\n" << std::flush
+	std::cerr << "--->> rootCA key and crt failed to load!\n" << std::flush;
 	return 0;
 }
 
