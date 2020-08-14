@@ -252,7 +252,7 @@ private:
   const std::vector<Envoy::Ssl::ServerContextConfig::SessionTicketKey> session_ticket_keys_;
 
   std::unique_ptr<Envoy::Extensions::TransportSockets::Tls::CrtGenerator> crtGenerator_;
-  std::mutex context_map_mutext_;
+  std::mutex context_map_mutex_;
   std::unordered_map<std::string,bssl::UniquePtr<SSL_CTX>> context_map_;
 };
 
