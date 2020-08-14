@@ -247,7 +247,7 @@ private:
   bssl::UniquePtr<SSL_CTX> makeSslCtx(std::string server_name);
 
   SessionContextID generateHashForSessionContextId(const std::vector<std::string>& server_names);
-  const std::unordered_map<std::string,bssl::UniquePtr<SSL_CTX>>::iterator& getContextMapIteratorForServerName(const std::string server_name);
+  std::unordered_map<std::string,bssl::UniquePtr<SSL_CTX>>::iterator getContextMapIteratorForServerName(const std::string server_name);
 
   const std::vector<Envoy::Ssl::ServerContextConfig::SessionTicketKey> session_ticket_keys_;
 
