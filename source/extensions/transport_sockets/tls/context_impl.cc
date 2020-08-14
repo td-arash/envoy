@@ -1273,6 +1273,12 @@ bool ServerContextImpl::isClientEcdsaCapable(const SSL_CLIENT_HELLO* ssl_client_
   return false;
 }
 
+std::unordered_map<std::string,bssl::UniquePtr<SSL_CTX>>::iterator& ServerContextImpl::getContextMapIteratorForServerName(const std::string server_name)
+{
+  std::shared_lock<shared_mutext> reader_lock(this->context_map_mutext_);
+  return this->context_map_.find(std::string(server_name));
+}
+
 enum ssl_select_cert_result_t
 ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bool useCrtGenerator) {
   const bool client_ecdsa_capable = isClientEcdsaCapable(ssl_client_hello);
@@ -1290,11 +1296,12 @@ ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bo
   } else {
     const char* server_name = SSL_get_servername(ssl_client_hello->ssl, TLSEXT_NAMETYPE_host_name);
     ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
-    const auto& iterator = this->context_map_.find(std::string(server_name));
+    const auto& iterator = 
     if (iterator != this->context_map_.end()) {
       ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: found context for: {}", server_name);
       ssl_ctx = iterator->second.get();
     } else {
+      std::unique_lock<shared_mutex> writer_lock(this->context_map_mutext_);
       ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: context not found");
       this->context_map_[server_name] = this->makeSslCtx(server_name);
       ssl_ctx = this->context_map_[server_name].get();
@@ -1328,8 +1335,7 @@ ServerContextImpl::makeSslCtx(std::string server_name) {
     }
     return sslCtxPtr;
   }
-  sslCtxPtr.reset(nullptr);
-  return sslCtxPtr;
+  return bssl::UniquePtr<SSL_CTX>(nullptr);
 }
 
 void ServerContextImpl::TlsContext::addClientValidationContext(
