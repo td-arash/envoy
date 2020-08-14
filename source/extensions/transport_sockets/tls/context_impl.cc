@@ -1296,7 +1296,7 @@ ServerContextImpl::selectTlsContext(const SSL_CLIENT_HELLO* ssl_client_hello, bo
   } else {
     const char* server_name = SSL_get_servername(ssl_client_hello->ssl, TLSEXT_NAMETYPE_host_name);
     ENVOY_LOG_MISC(debug, "--->>> server_name: {}", server_name == nullptr ? "NA" : server_name);
-    const auto& iterator = 
+    const auto& iterator = this->getContextMapIteratorForServerName(server_name);
     if (iterator != this->context_map_.end()) {
       ENVOY_LOG_MISC(debug, "--->> in selectTlsContext: found context for: {}", server_name);
       ssl_ctx = iterator->second.get();
