@@ -5,6 +5,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <shared_mutex>
 
 #include "envoy/network/transport_socket.h"
 #include "envoy/ssl/context.h"
