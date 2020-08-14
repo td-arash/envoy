@@ -1273,7 +1273,7 @@ bool ServerContextImpl::isClientEcdsaCapable(const SSL_CLIENT_HELLO* ssl_client_
   return false;
 }
 
-std::unordered_map<std::string,bssl::UniquePtr<SSL_CTX>>::iterator& ServerContextImpl::getContextMapIteratorForServerName(const std::string server_name)
+const std::unordered_map<std::string,bssl::UniquePtr<SSL_CTX>>::iterator& ServerContextImpl::getContextMapIteratorForServerName(const std::string server_name)
 {
   std::shared_lock<std::shared_timed_mutex> reader_lock(this->context_map_mutex_);
   return this->context_map_.find(std::string(server_name));
